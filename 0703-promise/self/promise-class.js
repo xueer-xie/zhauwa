@@ -124,6 +124,10 @@ class MPromise {
     return promise2;
   }
 
+  catch(onRejected) {
+    return this.then(null, onRejected);
+  }
+
   resolvePromise(promise2, x, resolve, reject) {
     // 7.1 如果 promise2  和 x 相等， 那么 reject TypeError
     if (promise2 === x) {
@@ -190,12 +194,94 @@ class MPromise {
   isFunction(value) {
     return typeof value === 'function';
   }
+
+  static resolve(value) {
+    if (value instanceof MPromise) {
+      return value;
+    }
+
+    return new MPromise((resolve) => {
+      resolve(value);
+    })
+  }
+
+  static reject(reason) {
+    return new MPromise((resolve, reject) => {
+      reject(reason);
+    })
+  }
+
+  static race(promiseList) {
+    return new MPromise((resolve, reject) => {
+      const length = promiseList.length;
+
+      if (length === 0) {
+        return resolve();
+      } else {
+        for (let i = 0; i < length; i++) {
+          MPromise.resolve(promiseList[i]).then(
+            (value) => {
+              return resolve(value);
+            },
+            (reason) => {
+              return reject(reason);
+            }
+          )
+        }
+      }
+    })
+  }
 }
+
+// const test = new MPromise((resolve, reject) => {
+//   setTimeout(() => {
+//     resolve(111);
+//   }, 1000);
+// }).then((value) => {
+//   console.log('then');
+//   // 默认return undefined
+// })
+
+// setTimeout(() => {
+//   console.log(test); // value是什么值 
+// }, 3000);
+
+// test
+// MPromise {
+//   FULFILLED_CALLBACK_LIST: [],
+//   REJECTED_CALLBACK_LIST: [],
+//   _status: 'fulfilled',
+//   value: undefined,
+//   reason: null
+// }
 
 const test = new MPromise((resolve, reject) => {
   setTimeout(() => {
-    resolve(111);
+    reject(111);
   }, 1000);
-}).then((value) => {
-  console.log(value);
+}).catch((reason) => {
+  console.log('报错' + reason);
+  console.log(test); // test status 是什么
+  // MPromise {
+  //   FULFILLED_CALLBACK_LIST: [],
+  //   REJECTED_CALLBACK_LIST: [],
+  //   _status: 'pending',
+  //   value: null,
+  //   reason: null
+  // }
 })
+
+setTimeout(() => {
+  console.log(test); // value是什么值 
+  // MPromise {
+  //   FULFILLED_CALLBACK_LIST: [],
+  //   REJECTED_CALLBACK_LIST: [],
+  //   _status: 'fulfilled',
+  //   value: undefined,
+  //   reason: null
+  // }
+}, 3000);
+
+// 1. catch 函数会返回一个新的promise， 而test就是这个新的promsie
+// 2. catch 回调里， 打印promise的时候， 整个毁掉并没有执行完成， pending， 只有当整个回调完成了， 才会更改状态
+// 3. catch 回调函数， 如果成功执行完成， 新的promise的状态会变成fulfilled
