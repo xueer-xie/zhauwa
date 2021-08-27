@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <ul id="ul">
+    <li>1</li>
+    <li>2</li>
+    <li>3</li>
+    <li>4</li>
+    <li>5</li>
+    <li>6</li>
+    <li>7</li>
+    <li>8</li>
+    <li>9</li>
+  </ul>
+</body>
+<script type="text/javascript">
+  // const liList = document.getElementsByTagName('li');
+
+  // for (let i = 0; i < liList.length; i++) {
+  //   liList[i].addEventListener('click', function (e) {
+  //     alert(`内容为${e.target.innerHtml}, 索引为${i}`);
+  //   });
+  // }
+
+  const ul = document.querySelector('ul');
+
+  ul.addEventListener('click', function(e) {
+    const target = e.target;
+    if (target.tagName.toLowerCase() === 'li') {
+      const liList = this.querySelectorAll('li');
+      // const index = Array.prototype.indexOf.call(liList, target);
+      const realArray = Array.from(liList);
+      const index = realArray.indexOf(target)
+      alert(`内容为${e.target.innerHtml}, 索引为${i}`);
+    }
+  })
+</script>
+<style>
+  #ul {
+    background-color: gray;
+    width: 700px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  li {
+    background-color: aliceblue;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 80%;
+    margin-bottom: 10px;
+  }
+</style>
+</html>
